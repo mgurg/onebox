@@ -32,7 +32,7 @@ services:
             EENGINE_SECRET: 'secret'
             # Database connection URL
             EENGINE_REDIS: 'redis://redis:6379/2'
-
+            EENGINE_CORS_ORIGIN: "*"
     redis:
         image: redis:alpine
         restart: always
