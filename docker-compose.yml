@@ -5,16 +5,7 @@ services:
             context: .
             # dockerfile: ./Dockerfile
             dockerfile: ./Dockerfile.dev
-            # args:
-            #   - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
-            #   - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
-            #   - AWS_DEFAULT_REGION=${AWS_DEFAULT_REGION}
-            #   - FLASK_SECRET_KEY=${FLASK_SECRET_KEY}
-            #   - POSTGRES_USER=${POSTGRES_USER}
-            #   - POSTGRES_PW=${POSTGRES_PW}
-            #   - POSTGRES_URL=${POSTGRES_URL}
-            #   - POSTGRES_DB=${POSTGRES_DB}
-        # container_name: aws-ecs-demo
+        container_name: o-api
         volumes:
             - ./app:/src/app
         ports:
@@ -30,8 +21,8 @@ services:
         #   - POSTGRES_URL=${POSTGRES_URL}
         #   - POSTGRES_DB=${POSTGRES_DB}
         env_file: ./app/.env
-        #   depends_on:
-        #     - db
+        depends_on:
+            - db
 
     db:
       image: postgres:15
@@ -43,42 +34,42 @@ services:
         - POSTGRES_USER=postgres
         - POSTGRES_PASSWORD=postgres
         - POSTGRES_DB=postgres
-    emailengine:
-        restart: no
-        image: postalsys/emailengine:latest
-        ports:
-            # API and web interface
-            - '3000:3000'
-            # SMTP for message submission
-            - '2525:2525'
-            # IMAP proxy
-            - '9993:9993'
-        depends_on:
-            - redis
-        environment:
-            # Configuration to EmailEngine can be passed via environment variables
-            # For full list see https://github.com/postalsys/emailengine#config-mapping
+    # emailengine:
+    #     restart: no
+    #     image: postalsys/emailengine:latest
+    #     ports:
+    #         # API and web interface
+    #         - '3000:3000'
+    #         # SMTP for message submission
+    #         - '2525:2525'
+    #         # IMAP proxy
+    #         - '9993:9993'
+    #     depends_on:
+    #         - redis
+    #     environment:
+    #         # Configuration to EmailEngine can be passed via environment variables
+    #         # For full list see https://github.com/postalsys/emailengine#config-mapping
 
-            # Settings to write to v1/settings on startup (https://api.emailengine.app/#operation/postV1Settings)
-            # The following value is a YAML block scalar string, so make it sure it is properly indented
-            # This configuration enables SMTP server for local submission
-            EENGINE_SETTINGS: >
-                {
-                    "smtpServerEnabled": true,
-                    "smtpServerPort": 2525,
-                    "smtpServerHost": "0.0.0.0",
-                    "smtpServerAuthEnabled": true,
-                    "smtpServerPassword": "passw0rd"
-                }
+    #         # Settings to write to v1/settings on startup (https://api.emailengine.app/#operation/postV1Settings)
+    #         # The following value is a YAML block scalar string, so make it sure it is properly indented
+    #         # This configuration enables SMTP server for local submission
+    #         EENGINE_SETTINGS: >
+    #             {
+    #                 "smtpServerEnabled": true,
+    #                 "smtpServerPort": 2525,
+    #                 "smtpServerHost": "0.0.0.0",
+    #                 "smtpServerAuthEnabled": true,
+    #                 "smtpServerPassword": "passw0rd"
+    #             }
 
-            # Encryption secret
-            EENGINE_SECRET: 'secret'
-            # Database connection URL
-            EENGINE_REDIS: 'redis://redis:6379/2'
-            EENGINE_CORS_ORIGIN: "*"
-    redis:
-        image: redis:alpine
-        restart: no
-        user: ${uid}
-        volumes:
-             - "./data/redis:/data"
+    #         # Encryption secret
+    #         EENGINE_SECRET: 'secret'
+    #         # Database connection URL
+    #         EENGINE_REDIS: 'redis://redis:6379/2'
+    #         EENGINE_CORS_ORIGIN: "*"
+    # redis:
+    #     image: redis:alpine
+    #     restart: no
+    #     user: ${uid}
+    #     volumes:
+    #          - "./data/redis:/data"
