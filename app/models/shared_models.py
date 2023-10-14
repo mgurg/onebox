@@ -17,3 +17,24 @@ class Tenant(Base):
     schema_header_id = sa.Column("schema_header_id", sa.String(128), nullable=True)
 
     __table_args__ = {"schema": "public"}
+
+
+class PublicUser(Base):
+    __tablename__ = "public_users"
+    id = sa.Column(sa.INTEGER(), sa.Identity(), primary_key=True, autoincrement=True, nullable=False)
+    uuid = sa.Column(UUID(as_uuid=True), autoincrement=False, nullable=True)
+    first_name = sa.Column(sa.VARCHAR(length=100), autoincrement=False, nullable=True)
+    last_name = sa.Column(sa.VARCHAR(length=100), autoincrement=False, nullable=True)
+    email = sa.Column(sa.VARCHAR(length=256), autoincrement=False, nullable=True, unique=True)
+    password = sa.Column(sa.VARCHAR(length=256), autoincrement=False, nullable=True, unique=True)
+    service_token = sa.Column(sa.VARCHAR(length=100), autoincrement=False, nullable=True, unique=True)
+    service_token_valid_to = sa.Column(sa.TIMESTAMP(timezone=True), autoincrement=False, nullable=True)
+    is_active = sa.Column(sa.BOOLEAN(), autoincrement=False, nullable=True)
+    is_verified = sa.Column(sa.BOOLEAN(), autoincrement=False, nullable=True)
+    tos = sa.Column(sa.BOOLEAN(), autoincrement=False, nullable=True)
+    tenant_id = sa.Column(sa.VARCHAR(length=256), autoincrement=False, nullable=True)
+    tz = sa.Column(sa.VARCHAR(length=64), autoincrement=False, nullable=True, unique=True)
+    lang = sa.Column(sa.VARCHAR(length=8), autoincrement=False, nullable=True, unique=True)
+    created_at = sa.Column(sa.TIMESTAMP(timezone=True), autoincrement=False, nullable=True)
+    updated_at = sa.Column(sa.TIMESTAMP(timezone=True), autoincrement=False, nullable=True)
+    __table_args__ = {"schema": "public"}
