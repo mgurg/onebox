@@ -1,5 +1,7 @@
 from contextlib import asynccontextmanager
+from functools import lru_cache
 
+from fastapi import Depends, Request
 import sqlalchemy as sa
 from loguru import logger
 from sqlalchemy.ext.asyncio import async_sessionmaker, AsyncSession, async_session
@@ -24,10 +26,6 @@ DEFAULT_DB = settings.DEFAULT_DATABASE_DB
 SQLALCHEMY_DB_URL = f"postgresql+psycopg://{DEFAULT_DB_USER}:{DEFAULT_DB_PASS}@{DEFAULT_DB_HOST}:5432/{DEFAULT_DB}"
 echo = False
 
-print("======")
-print(SQLALCHEMY_DB_URL)
-print("======")
-
 engine = create_async_engine(SQLALCHEMY_DB_URL, echo=echo, pool_pre_ping=True, pool_recycle=280)
 async_session = sessionmaker(engine, class_=AsyncSession, expire_on_commit=False)
 
@@ -40,9 +38,23 @@ Base = declarative_base(metadata=metadata)
 #     async with async_session() as session:
 #         yield session
 
+@lru_cache(maxsize=1)
+async def get_tenants():
+    ...
+    # async with with_db("public") as db:
+    #     query = select(PublicCompany).where(PublicCompany.tenant_id == host_without_port)
+    #
+    #     print("Fetching from DB")
+    #     result = db.execute(query)
+    #     tenant = result.scalar_one_or_none()
+    #
+    #     return tenant
 
-async def get_session():
-    async with with_db("xxx") as db:
+
+async def get_session(request: Request):
+    tenant = request.headers.get("tenant")
+    pg_schema = tenant if tenant else "public"
+    async with with_db(pg_schema) as db:
         yield db
 
 
