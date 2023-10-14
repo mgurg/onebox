@@ -21,5 +21,5 @@ async def auth_account_limit(*, public_db: PublicDB):  # *, public_db: PublicDB
 @auth_router.get("/user")
 async def auth_account_limit(*, public_db: PublicDB):  # *, public_db: PublicDB
 
-    user = await crud_user.get_user_by_email(public_db, "n@n.pl")
+    user = await crud_user.get_user_by_email(public_db, "mn@mn.pl")
     return user
