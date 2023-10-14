@@ -1,15 +1,11 @@
-import time
-from contextlib import contextmanager
-from functools import lru_cache
-from typing import Annotated
+from contextlib import asynccontextmanager
 
 import sqlalchemy as sa
-from fastapi import Depends, Request
 from loguru import logger
-from sqlalchemy import create_engine, event, select
-from sqlalchemy.engine import Engine
-from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession
-from sqlalchemy.orm import Session, declarative_base, sessionmaker
+from sqlalchemy.ext.asyncio import async_sessionmaker, AsyncSession, async_session
+from sqlalchemy.ext.asyncio import create_async_engine
+from sqlalchemy.orm import declarative_base
+from sqlalchemy.orm import sessionmaker
 
 from app.config import get_settings
 
@@ -31,11 +27,41 @@ print(SQLALCHEMY_DB_URL)
 print("======")
 
 engine = create_async_engine(SQLALCHEMY_DB_URL, echo=echo, pool_pre_ping=True, pool_recycle=280)
+async_session = sessionmaker(engine, class_=AsyncSession, expire_on_commit=False)
 
-metadata = sa.MetaData(schema="tenant")
+metadata = sa.MetaData(schema="tn")
 Base = declarative_base(metadata=metadata)
 
-async def get_session() -> AsyncSession:
-    async_session = sessionmaker(engine, class_=AsyncSession, expire_on_commit=False)
-    async with async_session() as session:
-        yield session
+
+# async def get_session() -> AsyncSession:
+#     async_session = sessionmaker(engine, class_=AsyncSession, expire_on_commit=False)
+#     async with async_session() as session:
+#         yield session
+
+
+async def get_session():
+    async with with_db("xxx") as db:
+        yield db
+    # --------------------
+
+
+# for async support
+@asynccontextmanager
+async def with_db(tenant_schema: str | None):
+    if tenant_schema:
+        schema_translate_map = {"tenant": tenant_schema}
+    else:
+        schema_translate_map = None
+
+    connectable = engine.execution_options(schema_translate_map=schema_translate_map)
+    try:
+        async with async_session(autocommit=False, autoflush=False, bind=connectable) as session:
+            yield session
+    except Exception as e:
+        logger.error(e)
+        await session.rollback()
+        print("ERRRR: " + tenant_schema)
+    finally:
+        await session.close()
+
+# https://github.com/sqlalchemy/sqlalchemy/discussions/10024
