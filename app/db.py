@@ -1,10 +1,9 @@
 from contextlib import asynccontextmanager
 from functools import lru_cache
 
-from fastapi import Depends, Request
+from fastapi import Request
 import sqlalchemy as sa
-from loguru import logger
-from sqlalchemy.ext.asyncio import async_sessionmaker, AsyncSession, async_session
+from sqlalchemy.ext.asyncio import AsyncSession, async_session
 from sqlalchemy.ext.asyncio import create_async_engine
 from sqlalchemy.orm import declarative_base
 from sqlalchemy.orm import sessionmaker
@@ -23,8 +22,11 @@ DEFAULT_DB = settings.DEFAULT_DATABASE_DB
 # SQLALCHEMY_DB_URL = settings.DEFAULT_SQLALCHEMY_DATABASE_URI
 
 
-SQLALCHEMY_DB_URL = f"postgresql+psycopg://{DEFAULT_DB_USER}:{DEFAULT_DB_PASS}@{DEFAULT_DB_HOST}:5432/{DEFAULT_DB}"
+# SQLALCHEMY_DB_URL = f"postgresql+psycopg://{DEFAULT_DB_USER}:{DEFAULT_DB_PASS}@{DEFAULT_DB_HOST}:5432/{DEFAULT_DB}"
+SQLALCHEMY_DB_URL = f"postgresql+asyncpg://{DEFAULT_DB_USER}:{DEFAULT_DB_PASS}@{DEFAULT_DB_HOST}:5432/{DEFAULT_DB}"
 echo = False
+
+print(SQLALCHEMY_DB_URL)
 
 engine = create_async_engine(SQLALCHEMY_DB_URL, echo=echo, pool_pre_ping=True, pool_recycle=280)
 async_session = sessionmaker(engine, class_=AsyncSession, expire_on_commit=False)
@@ -38,7 +40,8 @@ Base = declarative_base(metadata=metadata)
 #     async with async_session() as session:
 #         yield session
 
-@lru_cache(maxsize=1)
+
+@lru_cache(maxsize=10)
 async def get_tenants():
     ...
     # async with with_db("public") as db:
@@ -68,7 +71,7 @@ async def with_db(tenant_schema: str | None):
     except (psycopg.errors.UndefinedTable, sqlalchemy.exc.ProgrammingError):
         print("no schema: ")
         await session.rollback()
-    except Exception as e:
+    except Exception:
         await session.rollback()
         print("ERRRR: " + tenant_schema)
     finally:

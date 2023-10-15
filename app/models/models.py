@@ -1,6 +1,5 @@
 import sqlalchemy as sa
-from sqlalchemy.dialects.postgresql import JSONB, UUID
-from sqlalchemy.orm import relationship
+from sqlalchemy.dialects.postgresql import UUID
 
 from app.db import Base
 

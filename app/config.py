@@ -1,7 +1,6 @@
 import os
 from functools import lru_cache
 from pathlib import Path
-from typing import Literal
 
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
@@ -19,7 +18,7 @@ class Settings(BaseSettings):
     DEFAULT_DATABASE_PASSWORD: str | None = os.getenv("DB_PASSWORD")
 
     # "postgresql+psycopg://postgres:postgres@db:5432/postgres"
-    DB_CONFIG: str = "postgresql+psycopg://{DB_USER}:{DB_PASSWORD}@db:5432/{DB_NAME}".format(
+    DB_CONFIG: str = "postgresql+asyncpg://{DB_USER}:{DB_PASSWORD}@db:5432/{DB_NAME}".format(
         DB_USER=os.getenv("DB_USERNAME"),
         DB_PASSWORD=os.getenv("DB_PASSWORD"),
         DB_NAME=os.getenv("DB_DATABASE"),
