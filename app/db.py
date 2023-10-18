@@ -1,14 +1,15 @@
 from contextlib import asynccontextmanager
 from functools import lru_cache
 
-from fastapi import Request
+import psycopg.errors
 import sqlalchemy as sa
+import sqlalchemy.exc
+from fastapi import Request
+from pydantic import PostgresDsn
 from sqlalchemy.ext.asyncio import AsyncSession, async_session
 from sqlalchemy.ext.asyncio import create_async_engine
 from sqlalchemy.orm import declarative_base
 from sqlalchemy.orm import sessionmaker
-import psycopg.errors
-import sqlalchemy.exc
 
 from app.config import get_settings
 
@@ -23,12 +24,12 @@ DEFAULT_DB = settings.DEFAULT_DATABASE_DB
 
 
 # SQLALCHEMY_DB_URL = f"postgresql+psycopg://{DEFAULT_DB_USER}:{DEFAULT_DB_PASS}@{DEFAULT_DB_HOST}:5432/{DEFAULT_DB}"
-SQLALCHEMY_DB_URL = f"postgresql+asyncpg://{DEFAULT_DB_USER}:{DEFAULT_DB_PASS}@{DEFAULT_DB_HOST}:5432/{DEFAULT_DB}"
+SQLALCHEMY_DB_URL: PostgresDsn = f"postgresql+asyncpg://{DEFAULT_DB_USER}:{DEFAULT_DB_PASS}@{DEFAULT_DB_HOST}:5432/{DEFAULT_DB}"
 echo = False
 
 print(SQLALCHEMY_DB_URL)
 
-engine = create_async_engine(SQLALCHEMY_DB_URL, echo=echo, pool_pre_ping=True, pool_recycle=280)
+engine = create_async_engine(settings.DB_CONFIG_PG.unicode_string(), echo=echo, pool_pre_ping=True, pool_recycle=280)
 async_session = sessionmaker(engine, class_=AsyncSession, expire_on_commit=False)
 
 metadata = sa.MetaData(schema="tenant")

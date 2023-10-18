@@ -43,15 +43,11 @@ class SchedulerMiddleware:
             await self.app(scope, receive, send)
 
 
-engine = create_async_engine(settings.DB_CONFIG)
+engine = create_async_engine(settings.DB_CONFIG.unicode_string())
 data_store = SQLAlchemyDataStore(engine)
 event_broker = AsyncpgEventBroker.from_async_sqla_engine(engine)
 scheduler = AsyncScheduler(data_store, event_broker)
 middleware = [Middleware(SchedulerMiddleware, scheduler=scheduler)]
-
-
-# app = FastAPI(middleware=middleware)
-# app.add_api_route("/", root)
 
 
 def create_application() -> FastAPI:
@@ -82,7 +78,14 @@ app = create_application()
 
 @app.get("/add_task")
 async def root(request: Request) -> Response:
-    return PlainTextResponse("Hello, world!")
+    await scheduler.add_job(tick)
+    return PlainTextResponse("Single Job")
+
+
+@app.get("/start_interval_task")
+async def root(request: Request) -> Response:
+    await scheduler.add_schedule(tick, IntervalTrigger(seconds=10), id="tick")
+    return PlainTextResponse("Tick in 10s")
 
 
 @app.get("/")

@@ -9,7 +9,7 @@ from app.config import get_settings
 settings = get_settings()
 
 config = context.config
-config.set_main_option("sqlalchemy.url", settings.DB_CONFIG)
+config.set_main_option("sqlalchemy.url", settings.DB_CONFIG_PG.unicode_string())
 
 
 # this is the Alembic Config object, which provides
