@@ -9,9 +9,11 @@ from fastapi.requests import Request
 from fastapi.responses import PlainTextResponse, Response
 
 from app.api.auth import auth_router
+from app.api.users import user_router
 from app.config import get_settings
 from app.service.scheduler_middleware import scheduler, middleware
 from app.service.tenants import alembic_upgrade_head
+from fastapi_pagination import add_pagination
 
 settings = get_settings()
 
@@ -39,11 +41,13 @@ def create_application() -> FastAPI:
 
     # application.add_api_route("/", root)
     application.include_router(auth_router, prefix="/auth", tags=["AUTH"])
+    application.include_router(user_router, prefix="/users", tags=["USER"])
 
     return application
 
 
 app = create_application()
+add_pagination(app)
 
 
 @app.get("/add_task")
@@ -63,6 +67,10 @@ async def register_tenant():
     await alembic_upgrade_head("tn", "head")
     return {"message": "Hello World"}
 
+
 @app.get("/")
 async def root():
     return {"message": "Hello World"}
+
+
+# https://github.com/tiangolo/fastapi/issues/4627

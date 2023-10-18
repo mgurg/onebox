@@ -3,7 +3,6 @@ import re
 import traceback
 from uuid import UUID
 
-import sqlalchemy as sa
 from alembic import command
 from alembic.config import Config
 from loguru import logger
@@ -11,7 +10,7 @@ from sqlalchemy.ext.asyncio import create_async_engine
 
 
 from app.config import get_settings
-from app.db import SQLALCHEMY_DB_URL, with_db
+from app.db import SQLALCHEMY_DB_URL
 
 settings = get_settings()
 

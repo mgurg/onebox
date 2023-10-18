@@ -14,9 +14,9 @@ settings = get_settings()
 
 class SchedulerMiddleware:
     def __init__(
-            self,
-            app: ASGIApp,
-            scheduler: AsyncScheduler,
+        self,
+        app: ASGIApp,
+        scheduler: AsyncScheduler,
     ) -> None:
         self.app = app
         self.scheduler = scheduler
