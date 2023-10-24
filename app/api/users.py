@@ -1,18 +1,22 @@
 from typing import Annotated
 from uuid import UUID
+
 from fastapi import APIRouter, Depends
-from fastapi_pagination import Params
+from fastapi_pagination import Page, Params
 from fastapi_pagination.ext.sqlalchemy import paginate
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.crud import crud_users
 from app.db import get_session
-
+from app.models.models import User
+from app.schemas.responses.responses import UserIndexResponse
+from sqlalchemy import Select, func, select, text
+from sqlalchemy.orm import selectinload
 user_router = APIRouter()
 UserDB = Annotated[AsyncSession, Depends(get_session)]
 
 
-@user_router.get("/")
+@user_router.get("/", response_model=Page[UserIndexResponse])
 async def user_get_all(
     *,
     db: UserDB,
@@ -25,7 +29,9 @@ async def user_get_all(
     if field not in ["first_name", "last_name", "created_at"]:
         field = "last_name"
 
-    db_users_query = crud_users.get_users(field, order, search)
+    db_users_query = crud_users.get_users()
+
+    # db_users_query = select(User)
 
     # result = db.execute(db_users_query)  # await db.execute(query)
     # db_users = result.scalars().all()
