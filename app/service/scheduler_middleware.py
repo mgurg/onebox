@@ -5,7 +5,7 @@ from apscheduler.datastores.sqlalchemy import SQLAlchemyDataStore
 from apscheduler.eventbrokers.asyncpg import AsyncpgEventBroker
 from sqlalchemy.ext.asyncio import create_async_engine
 from starlette.middleware import Middleware
-from starlette.types import ASGIApp, Scope, Receive, Send
+from starlette.types import ASGIApp, Receive, Scope, Send
 
 from app.config import get_settings
 

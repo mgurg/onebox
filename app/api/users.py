@@ -8,10 +8,8 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.crud import crud_users
 from app.db import get_session
-from app.models.models import User
 from app.schemas.responses.responses import UserIndexResponse
-from sqlalchemy import Select, func, select, text
-from sqlalchemy.orm import selectinload
+
 user_router = APIRouter()
 UserDB = Annotated[AsyncSession, Depends(get_session)]
 
@@ -45,7 +43,7 @@ async def user_get_one(user_uuid: UUID):
 
 
 @user_router.post("/")
-async def user_get_all():
+async def user_add_all():
     return "OK"
 
 

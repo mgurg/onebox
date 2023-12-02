@@ -8,7 +8,6 @@ from alembic.config import Config
 from loguru import logger
 from sqlalchemy.ext.asyncio import create_async_engine
 
-
 from app.config import get_settings
 from app.db import SQLALCHEMY_DB_URL
 

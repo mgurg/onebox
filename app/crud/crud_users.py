@@ -1,7 +1,9 @@
+from fastapi_pagination import Params
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio.session import AsyncSession
+
 from app.models.models import User
-from fastapi_pagination import Page, Params
+
 
 def get_users(sort_column: str | None = None, sort_order: str | None = None, search: str | None = None):
     query = select(User).where(User.deleted_at.is_(None)).where(User.is_visible.is_(True)).order_by(User.id.desc())
@@ -21,6 +23,7 @@ def get_users(sort_column: str | None = None, sort_order: str | None = None, sea
     # result = db.execute(query)  # await db.execute(query)
     #
     # return result.scalars().all()
+
 
 async def get_usrs(db: AsyncSession, params: Params):
     ...

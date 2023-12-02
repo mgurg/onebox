@@ -7,13 +7,13 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.requests import Request
 from fastapi.responses import PlainTextResponse, Response
+from fastapi_pagination import add_pagination
 
 from app.api.auth import auth_router
 from app.api.users import user_router
 from app.config import get_settings
-from app.service.scheduler_middleware import scheduler, middleware
+from app.service.scheduler_middleware import middleware, scheduler
 from app.service.tenants import alembic_upgrade_head
-from fastapi_pagination import add_pagination
 
 settings = get_settings()
 
@@ -51,13 +51,13 @@ add_pagination(app)
 
 
 @app.get("/add_task")
-async def root(request: Request) -> Response:
+async def root_task(request: Request) -> Response:
     await scheduler.add_job(tick)
     return PlainTextResponse("Single Job")
 
 
 @app.get("/start_interval_task")
-async def root(request: Request) -> Response:
+async def root_scheduler(request: Request) -> Response:
     await scheduler.add_schedule(tick, IntervalTrigger(seconds=10), id="tick")
     return PlainTextResponse("Tick in 10s")
 

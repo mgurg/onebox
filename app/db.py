@@ -6,10 +6,8 @@ import sqlalchemy as sa
 import sqlalchemy.exc
 from fastapi import Request
 from pydantic import PostgresDsn
-from sqlalchemy.ext.asyncio import AsyncSession, async_session
-from sqlalchemy.ext.asyncio import create_async_engine
-from sqlalchemy.orm import declarative_base
-from sqlalchemy.orm import sessionmaker
+from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
+from sqlalchemy.orm import declarative_base, sessionmaker
 
 from app.config import get_settings
 
